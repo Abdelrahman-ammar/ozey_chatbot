@@ -1,6 +1,6 @@
-import streamlit as st
+from flask import Flask, render_template, request
 import vertexai
-from vertexai.language_models import ChatModel, InputOutputTextPair
+from vertexai.language_models import ChatModel
 import vertexai.preview.generative_models as generative_models
 
 vertexai.init(project="wth-418421", location="us-central1")
@@ -20,23 +20,28 @@ safety_settings = {
     generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
 }
 
-def main():
-    st.title("Chat GUI")
-    user_input = st.text_input("You", "")
 
-    if st.button("Send"):
+app = Flask(__name__)
+
+@app.route("/chat", methods=["GET", "POST"])
+def chat():
+    if request.method == "POST":
+        user_input = request.form["user_input"]
+
         if user_input.lower() == "exit":
-            st.text("AI Bot: Goodbye!")
-        else:
-            chat = chat_model.start_chat(
-                context="""You are an AI friend called Ozey. You act as a personal cognitive behavioural therapist  to support users on their journey to emotional well-being.
+            return render_template("chat.html", response="AI Bot: Goodbye!")
+
+        chat = chat_model.start_chat(
+            context="""You are an AI friend called Ozey. You act as a personal cognitive behavioural therapist  to support users on their journey to emotional well-being.
                  make them Feel free to share their thoughts and feelings with you, and together  can work towards positive changes. If the user asks anything outside the domain, you should respond with \"My main focus is in mental health, your mental health. Sorry, I can't answer this.\"
                  When a session starts you should introduce yourself, ask the user how they feel and make them feel free to talk with you.
                  make your answers neither too long nor too short""",
-            )
-            response = chat.send_message(user_input, **parameters)
-            st.text("AI Bot: " + response.text)
+        )
+        response = chat.send_message(user_input, **parameters)
+        return response.text
 
+    return  "error"
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
+
