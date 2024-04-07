@@ -4,7 +4,7 @@ from vertexai.language_models import ChatModel
 import vertexai.preview.generative_models as generative_models
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "application_default_credentials.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "GOOGLE_APPLICATION_CREDENTIALS.json"
 
 vertexai.init(project="wth-418421", location="us-central1")
 chat_model = ChatModel.from_pretrained("chat-bison")
